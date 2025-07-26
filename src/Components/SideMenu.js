@@ -4,12 +4,11 @@ import CloseIcon from "@mui/icons-material/Close";
 import { ThemeContext } from "../Themes/Contexts";
 import image from "../Assets/Group 1000011095.png";
 import EditIcon from "../Assets/image 31.png";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 export default function SideMenu({ handleClose, setChats }) {
   const screenSize = useMediaQuery("(max-width:768px)");
   const { mode } = useContext(ThemeContext);
-  const navigate = useNavigate();
 
   return (
     <Box>
@@ -30,17 +29,23 @@ export default function SideMenu({ handleClose, setChats }) {
           Close
         </Button>
       )}
-
+      
       <Stack
+        component={Link}
+        to="/"
         direction="row"
         alignItems="center"
         justifyContent="space-between"
         py={2}
         spacing={1}
         px={{ xs: 2, md: 3 }}
-        sx={{ bgcolor: "primary.main", cursor: "pointer" }}
+        sx={{
+          bgcolor: "primary.main",
+          cursor: "pointer",
+          textDecoration: "none", 
+          color: "inherit", 
+        }}
         onClick={() => {
-          navigate("");
           handleClose(false);
           setChats([]);
         }}
@@ -70,10 +75,9 @@ export default function SideMenu({ handleClose, setChats }) {
 
       <Stack sx={{ margin: "auto", width: "90%" }}>
         <Button
-          onClick={() => {
-            navigate("/history");
-            handleClose(false);
-          }}
+          component={Link}
+          to="/history"
+          onClick={() => handleClose(false)}
           sx={{
             bgcolor: "primary.main",
             color: "text.primary",

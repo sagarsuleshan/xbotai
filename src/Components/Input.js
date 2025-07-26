@@ -11,10 +11,9 @@ export default function Input({ handleSave, getAnswer, page }) {
   return (
     <Box width="-webkit-fill-available" mb={3}>
       <Stack
-        component={"form"}
+        component="form"
         onSubmit={(e) => {
           e.preventDefault();
-          console.log(input, e);
           getAnswer(input);
           setInput("");
         }}
@@ -24,10 +23,12 @@ export default function Input({ handleSave, getAnswer, page }) {
         px={3}
       >
         <TextField
-          placeholder=""
+          placeholder="Message Bot AI..."
           value={input}
           onFocus={() => {
-            page === "history" && navigate("/");
+            if (page === "history") {
+              navigate("/");
+            }
           }}
           onChange={(e) => setInput(e.target.value)}
           sx={{
@@ -43,12 +44,11 @@ export default function Input({ handleSave, getAnswer, page }) {
             },
           }}
           required
+          inputProps={{ "aria-label": "Message Bot AI input" }}
         />
         <Button
           type="submit"
-          onClick={() => {
-            console.log("submit clicked");
-          }}
+          aria-label="Submit message"
           sx={{
             bgcolor: "primary.main",
             color: "text.primary",
@@ -59,13 +59,19 @@ export default function Input({ handleSave, getAnswer, page }) {
         </Button>
         <Button
           onClick={() => {
-            page !== "history" ? handleSave() : navigate("/");
+            if (page !== "history") {
+              handleSave();
+            } else {
+              navigate("/");
+            }
           }}
+          aria-label="Save conversation or navigate home"
           sx={{
             bgcolor: "primary.main",
             color: "text.primary",
             width: "fit-content",
           }}
+          type="button"
         >
           Save
         </Button>

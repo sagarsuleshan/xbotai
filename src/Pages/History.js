@@ -18,19 +18,32 @@ export default function History() {
 
   function getMonthFromNo(no) {
     switch (no) {
-      case 0: return "Jan";
-      case 1: return "Feb";
-      case 2: return "Mar";
-      case 3: return "Apr";
-      case 4: return "May";
-      case 5: return "Jun";
-      case 6: return "Jul";
-      case 7: return "Aug";
-      case 8: return "Sep";
-      case 9: return "Oct";
-      case 10: return "Nov";
-      case 11: return "Dec";
-      default: return "";
+      case 0:
+        return "Jan";
+      case 1:
+        return "Feb";
+      case 2:
+        return "Mar";
+      case 3:
+        return "Apr";
+      case 4:
+        return "May";
+      case 5:
+        return "Jun";
+      case 6:
+        return "Jul";
+      case 7:
+        return "Aug";
+      case 8:
+        return "Sep";
+      case 9:
+        return "Oct";
+      case 10:
+        return "Nov";
+      case 11:
+        return "Dec";
+      default:
+        return "";
     }
   }
 
@@ -38,8 +51,16 @@ export default function History() {
     date = new Date(date);
     let current = new Date();
     // Remove time part for pure day comparison
-    let dateDay = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
-    let currDay = new Date(current.getFullYear(), current.getMonth(), current.getDate()).getTime();
+    let dateDay = new Date(
+      date.getFullYear(),
+      date.getMonth(),
+      date.getDate()
+    ).getTime();
+    let currDay = new Date(
+      current.getFullYear(),
+      current.getMonth(),
+      current.getDate()
+    ).getTime();
     const MS_PER_DAY = 86400000;
     if (
       date.getFullYear() === current.getFullYear() &&
@@ -52,8 +73,14 @@ export default function History() {
         return "Yesterday's Chat";
       }
     }
-    return `${date.getDate()} ${getMonthFromNo(date.getMonth())} ${date.getFullYear()}`;
+    return `${date.getDate()} ${getMonthFromNo(
+      date.getMonth()
+    )} ${date.getFullYear()}`;
   }
+
+  useEffect(() => {
+    localStorage.setItem("chats", JSON.stringify(chats));
+  }, [chats]);
 
   // Load chats on mount
   useEffect(() => {
@@ -62,7 +89,6 @@ export default function History() {
       setChats(savedChats);
       setFilteredChats(savedChats);
     }
-    // console.log(savedChats);
   }, []);
 
   return (
@@ -125,8 +151,16 @@ export default function History() {
               >
                 {getDatedetails(ele?.human?.time) || "Previous Chat"}
               </Typography>
-              <ChatCard key={`human-${ele?.human?.id ?? idx}`} details={ele?.human} isReadOnly />
-              <ChatCard key={`ai-${ele?.AI?.id ?? idx}`} details={ele?.AI} isReadOnly />
+              <ChatCard
+                key={`human-${ele?.human?.id ?? idx}`}
+                details={ele?.human}
+                isReadOnly
+              />
+              <ChatCard
+                key={`ai-${ele?.AI?.id ?? idx}`}
+                details={ele?.AI}
+                isReadOnly
+              />
             </Stack>
           ))
         ) : (

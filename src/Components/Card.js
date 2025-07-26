@@ -3,6 +3,7 @@ import { Box, Stack, Typography } from "@mui/material";
 export default function Card({ heading, subheading, handleQue }) {
   return (
     <Stack
+      onClick={() => handleQue && handleQue(heading)}
       sx={{
         borderRadius: 1,
         flexGrow: 1,
@@ -10,6 +11,7 @@ export default function Card({ heading, subheading, handleQue }) {
         alignItems: "center",
         bgcolor: "primary.light",
         padding: { xs: 2, md: 3 },
+        cursor: "pointer",
         "&:hover": {
           opacity: 0.6,
         },
