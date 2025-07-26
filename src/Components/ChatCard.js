@@ -73,13 +73,17 @@ export default function ChatCard({ details, isReadOnly = false, setChats }) {
             <span>{details?.type === "AI" ? "Soul AI" : "You"}</span>
           </Typography>
 
-          <Box component="p" sx={{ margin: 0 }}>
-            {details?.chat || "chat"}
-          </Box>
+          <p style={{ margin: 0 }}>{details?.chat || "chat"}</p>
 
           <Stack direction="row" spacing={3} mt={1} alignItems="center">
-            <Typography variant="subheading" sx={{ opacity: 0.6, fontSize: 14 }}>
-              {time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" }) || "09:03 PM"}
+            <Typography
+              variant="subheading"
+              sx={{ opacity: 0.6, fontSize: 14 }}
+            >
+              {time.toLocaleTimeString([], {
+                hour: "2-digit",
+                minute: "2-digit",
+              }) || "09:03 PM"}
             </Typography>
 
             {details?.type === "AI" && !isReadOnly && (
@@ -97,7 +101,10 @@ export default function ChatCard({ details, isReadOnly = false, setChats }) {
                   {isLike ? <ThumbUpAltIcon /> : <ThumbUpAltOutlinedIcon />}
                 </IconButton>
 
-                <IconButton onClick={() => setIsOpen(true)} aria-label="Give feedback">
+                <IconButton
+                  onClick={() => setIsOpen(true)}
+                  aria-label="Give feedback"
+                >
                   <ThumbDownAltOutlinedIcon />
                 </IconButton>
               </Stack>
@@ -140,7 +147,11 @@ export default function ChatCard({ details, isReadOnly = false, setChats }) {
         </Stack>
 
         {!isReadOnly && (
-          <SuggesionModal open={isOpen} handleClose={setIsOpen} setFeedback={setFb} />
+          <SuggesionModal
+            open={isOpen}
+            handleClose={setIsOpen}
+            setFeedback={setFb}
+          />
         )}
       </Box>
     </Stack>
