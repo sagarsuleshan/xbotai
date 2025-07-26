@@ -9,43 +9,54 @@ import AIData from "../AIData/AIData.json";
 import ChatCard from "../Components/ChatCard";
 
 export default function Home() {
+  // chats and setChats provided by parent via outlet context
   const { chats = [], setChats, handleSidebar } = useOutletContext();
   const themeContext = useContext(ThemeContext);
   const screenSize = useMediaQuery("(max-width:768px)");
   const chatId = useRef(Number(localStorage.getItem("id") || 1));
   const scrollRef = useRef();
-  //const navigate = useNavigate();
 
+  // Load saved chats from localStorage on mount (if not handled upstream)
   useEffect(() => {
-    scrollRef.current?.lastElementChild?.scrollIntoView();
-  }, [chats]); // Only run when chats change
+    const savedChats = JSON.parse(localStorage.getItem("chats")) || [];
+    if (savedChats.length > 0) {
+      setChats(savedChats);
+    }
+  }, [setChats]);
 
+  // Scroll chat container to bottom when chats change
+  useEffect(() => {
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
+  }, [chats]);
+
+  // Handler to process user query and generate AI reply
   const getAnswer = (que) => {
     const ans = AIData.find(
       (data) => que.toLowerCase() === data.question.toLowerCase()
     );
     const answer = ans?.response || "Sorry, I didn't understand your query!";
-    // Only update chatId on mount, increment locally on each new chat
+
+    // Push human and AI messages as separate entries
     setChats((prev) => [
       ...prev,
       {
         id: chatId.current,
-        human: {
-          type: "Human",
-          chat: que,
-          time: new Date(),
-          id: chatId.current,
-        },
-        AI: {
-          type: "AI",
-          chat: answer,
-          time: new Date(),
-          id: chatId.current + 1,
-          rating: null,
-          feedBack: "",
-        },
+        type: "Human",
+        chat: que,
+        time: new Date(),
+      },
+      {
+        id: chatId.current + 1,
+        type: "AI",
+        chat: answer,
+        time: new Date(),
+        rating: null,
+        feedBack: "",
       },
     ]);
+
     chatId.current += 2;
     localStorage.setItem("id", chatId.current);
   };
@@ -63,36 +74,38 @@ export default function Home() {
       justifyContent="space-between"
     >
       <Navbar handleSidebar={handleSidebar} />
+
+      {/* Chat container with flexGrow and scroll */}
       <Box
         ref={scrollRef}
-        sx={{ mb: 1, height: "100%", scrollbarWidth: "none" }}
-        gap={10}
-        overflow="scroll"
-        display={chats.length === 0 ? "flex" : "block"}
-        justifyContent="end"
+        sx={{
+          flexGrow: 1,
+          mb: 0,
+          overflowY: "auto",
+          scrollbarWidth: "none", // Firefox hide scrollbar
+          "&::-webkit-scrollbar": { display: "none" }, // Webkit browsers hide scrollbar
+          display: "flex",
+          flexDirection: "column",
+          px: 2,
+          justifyContent: chats.length === 0 ? "center" : "flex-start",
+        }}
       >
-        {chats.length === 0 && (
+        {chats.length === 0 ? (
           <DefaultChats getAnswer={getAnswer} />
+        ) : (
+          chats.map((msg) => (
+            <ChatCard key={msg.id} details={msg} setChats={setChats} />
+          ))
         )}
-        {chats.length > 0 &&
-          chats.map((ele, idx) => (
-            <React.Fragment key={ele.id || idx}>
-              <ChatCard details={ele?.human} setChats={setChats} />
-              <ChatCard details={ele?.AI} setChats={setChats} />
-            </React.Fragment>
-          ))}
       </Box>
+
+      {/* Input area for user queries */}
       <Input
         handleSave={() => {
-          localStorage.setItem(
-            "chats",
-            JSON.stringify([
-              ...(JSON.parse(localStorage.getItem("chats")) || []),
-              ...chats,
-            ])
-          );
+          // Save current chats to localStorage (replace)
+          localStorage.setItem("chats", JSON.stringify(chats));
           setChats([]);
-          // navigate('/history');
+          // navigate('/history'); // uncomment if you want navigation after save
         }}
         getAnswer={getAnswer}
       />
