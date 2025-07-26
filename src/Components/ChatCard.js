@@ -73,7 +73,7 @@ export default function ChatCard({ details, isReadOnly = false, setChats }) {
             <span>{details?.type === "AI" ? "Soul AI" : "You"}</span>
           </Typography>
 
-          <p style={{ margin: 0 }}>{details?.chat || "chat"}</p>
+          <p data-testid="ai-response">{details?.chat || "chat"}</p>
 
           <Stack direction="row" spacing={3} mt={1} alignItems="center">
             <Typography
