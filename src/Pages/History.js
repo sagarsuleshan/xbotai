@@ -83,11 +83,18 @@ export default function History() {
   }, [chats]);
 
   // Load chats on mount
+  // useEffect(() => {
+  //   const savedChats = JSON.parse(localStorage.getItem("chats")) || [];
+  //   if (savedChats.length > 0) {
+  //     setChats(savedChats);
+  //     setFilteredChats(savedChats);
+  //   }
+  // }, []);
+
   useEffect(() => {
     const savedChats = JSON.parse(localStorage.getItem("chats")) || [];
     if (savedChats.length > 0) {
       setChats(savedChats);
-      setFilteredChats(savedChats);
     }
   }, []);
 
@@ -115,7 +122,7 @@ export default function History() {
           component="h1"
           sx={{ textAlign: "center", mt: chats.length ? "auto" : "10%" }}
         >
-          Conversation History
+          Past Conversations
         </Typography>
 
         {chats.length > 0 && (

@@ -36,7 +36,7 @@ export default function Home() {
     const ans = AIData.find(
       (data) => que.toLowerCase() === data.question.toLowerCase()
     );
-    const answer = ans?.response || "Sorry, I didn't understand your query!";
+    const answer = ans?.response || "Sorry, Did not understand your query!";
 
     // Push human and AI messages as separate entries
     setChats((prev) => [
