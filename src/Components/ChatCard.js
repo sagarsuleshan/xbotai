@@ -8,50 +8,44 @@ import ThumbDownAltOutlinedIcon from "@mui/icons-material/ThumbDownAltOutlined";
 import SuggesionModal from "./Modal";
 
 export default function ChatCard({ details, isReadOnly = false, setChats }) {
-  // Initialize star rating and like state from existing rating
   const [stars, setStars] = useState(details?.rating || 0);
-  const [isLike, setIsLike] = useState((details?.rating || 0) > 0);
+  const [isLike, setIsLike] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
-  const [fb, setFb] = useState(details?.feedBack || "");
+  const [fb, setFb] = useState(details?.fb || "");
 
-  // Update chats with new rating only when stars or isLike actually differ
   useEffect(() => {
-    if (isLike && stars !== details?.rating) {
+    if (!isReadOnly && isLike && setChats) {
       setChats((prev) =>
-        prev.map((item) => {
-          if (item?.AI?.id === details.id) {
-            return { ...item, AI: { ...item?.AI, rating: stars || 0 } };
-          }
-          return item;
-        })
+        prev.map((item) =>
+          item?.AI?.id === details.id
+            ? { ...item, AI: { ...item?.AI, rating: stars } }
+            : item
+        )
       );
     }
-    // Optional: you may reset rating when isLike is false, depends on UX expectations
-  }, [stars, isLike, details.id, details?.rating, setChats]);
+  }, [stars, isLike, details.id, isReadOnly, setChats]);
 
-  // Update chats with new feedback only when changed
   useEffect(() => {
-    if (fb !== details?.feedBack && fb !== "") {
+    if (!isReadOnly && fb && setChats) {
       setChats((prev) =>
-        prev.map((item) => {
-          if (item?.AI?.id === details.id) {
-            return { ...item, AI: { ...item?.AI, feedBack: fb } };
-          }
-          return item;
-        })
+        prev.map((item) =>
+          item?.AI?.id === details.id
+            ? { ...item, AI: { ...item?.AI, fb } }
+            : item
+        )
       );
     }
-  }, [fb, details.id, details?.feedBack, setChats]);
+  }, [fb, details.id, isReadOnly, setChats]);
 
   const time = new Date(details?.time || new Date());
 
   return (
     <Stack
       sx={{
-        boxShadow: !isReadOnly ? "0 0 4px rgba(0,0,0,0.1)" : "none",
+        boxShadow: !isReadOnly && "0 0 4px rgba(0,0,0,0.1)",
         bgcolor: isReadOnly ? "primary.main" : "primary.light",
         "&:hover #likeBtn": {
-          visibility: isReadOnly ? "hidden" : "visible",
+          visibility: "visible",
         },
       }}
       m={3}
@@ -59,75 +53,72 @@ export default function ChatCard({ details, isReadOnly = false, setChats }) {
       direction="row"
       spacing={1}
       p={3}
-      id={`chat-card-${details?.id}`}
     >
       <Box width={70} height={66} minWidth={69}>
-        {details?.type === "Human" ? (
-          <img src={Profile} alt="Profile" width={70} height={66} />
-        ) : (
-          <img src={AIProfile} alt="AI Profile" width={70} height={66} />
-        )}
+        <img
+          src={details?.type === "Human" ? Profile : AIProfile}
+          alt="Profile"
+          width={70}
+          height={66}
+        />
       </Box>
 
-      <Box height="fit-content" flex={1}>
+      <Box height="fit-content">
         <Stack>
-          <Typography variant="heading" component="h4">
+          <Typography variant="heading">
             {details?.type === "AI" ? "Soul AI" : "You"}
           </Typography>
 
           <Typography variant="body1">
-            {details?.chat || details?.message || "chat"}
+            {details?.chat || "No message available"}
           </Typography>
 
           <Stack direction="row" spacing={3} mt={1} alignItems="center">
-            <Typography variant="subheading" sx={{ opacity: 0.6, fontSize: 14 }}>
-              {time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) || "09:03 PM"}
+            <Typography
+              variant="subheading"
+              sx={{ opacity: 0.6, fontSize: 14 }}
+            >
+              {time.toLocaleTimeString()}
             </Typography>
 
-            {details?.type === "AI" && !isReadOnly && (
+            {!isReadOnly && details?.type === "AI" && (
               <Stack
-                display="flex"
                 direction="row"
                 spacing={0}
                 id="likeBtn"
                 sx={{ visibility: { xs: "visible", md: "hidden" } }}
               >
-                <IconButton
-                  onClick={() => setIsLike((prev) => !prev)}
-                  aria-label={isLike ? "Remove like" : "Like"}
-                >
+                <IconButton onClick={() => setIsLike((prev) => !prev)}>
                   {isLike ? <ThumbUpAltIcon /> : <ThumbUpAltOutlinedIcon />}
                 </IconButton>
-
-                <IconButton onClick={() => setIsOpen(true)} aria-label="Give feedback">
+                <IconButton onClick={() => setIsOpen(true)}>
                   <ThumbDownAltOutlinedIcon />
                 </IconButton>
               </Stack>
             )}
           </Stack>
 
-          {(isLike || (isReadOnly && stars > 0)) && (
-            <Typography component="legend" sx={{ mt: 1 }}>
-              {!isReadOnly ? "Rate" : "Ratings"}
-            </Typography>
+          {(isLike || (isReadOnly && details?.rating > 0)) && (
+            <>
+              <Typography component="legend">
+                {isReadOnly ? "Rating" : "Rate"}
+              </Typography>
+              <Rating
+                disabled={isReadOnly}
+                name="rating"
+                value={stars}
+                sx={{ width: "fit-content" }}
+                onChange={(_, val) => {
+                  if (isLike && val !== null) {
+                    setStars(val);
+                  }
+                }}
+              />
+            </>
           )}
 
-          {(isLike || (isReadOnly && stars > 0)) && (
-            <Rating
-              disabled={isReadOnly}
-              name={`rating-${details.id}`}
-              value={stars}
-              sx={{ width: "fit-content" }}
-              onChange={(_, val) => {
-                if (isLike) {
-                  setStars(val);
-                }
-              }}
-            />
-          )}
-
-          {details?.feedBack && (
-            <Typography component="legend" variant="body1" sx={{ mt: 1 }}>
+          {details?.fb && (
+            <Typography component="legend" variant="body1">
               Feedback:{" "}
               <Typography
                 component="span"
@@ -135,14 +126,18 @@ export default function ChatCard({ details, isReadOnly = false, setChats }) {
                 sx={{ opacity: 0.7 }}
                 color="text.primary"
               >
-                {details.feedBack}
+                {details.fb}
               </Typography>
             </Typography>
           )}
         </Stack>
 
         {!isReadOnly && (
-          <SuggesionModal open={isOpen} handleClose={setIsOpen} setFeedback={setFb} />
+          <SuggesionModal
+            open={isOpen}
+            handleClose={setIsOpen}
+            setFeedback={setFb}
+          />
         )}
       </Box>
     </Stack>

@@ -1,4 +1,4 @@
-import { useContext, useState, useEffect } from "react";
+import { useContext, useLayoutEffect, useState } from "react";
 import Navbar from "../Components/Navbar";
 import { useOutletContext } from "react-router-dom";
 import { Box, Stack, Typography, useMediaQuery } from "@mui/material";
@@ -16,20 +16,8 @@ export default function History() {
   const [filteredChats, setFilteredChats] = useState([]);
 
   function getMonthFromNo(no) {
-    const months = [
-      "Jan",
-      "Feb",
-      "Mar",
-      "Apr",
-      "May",
-      "Jun",
-      "Jul",
-      "Aug",
-      "Sep",
-      "Oct",
-      "Nov",
-      "Dec",
-    ];
+    const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                    "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     return months[no] || "";
   }
 
@@ -47,15 +35,13 @@ export default function History() {
     return `${date.getDate()} ${getMonthFromNo(date.getMonth())} ${date.getFullYear()}`;
   }
 
-  // Hydrate chats from localStorage on mount
-  useEffect(() => {
+  useLayoutEffect(() => {
     const savedChats = JSON.parse(localStorage.getItem("chats")) || [];
     setChats(savedChats);
     setFilteredChats(savedChats);
   }, []);
 
-  // Persist chats to localStorage when they change
-  useEffect(() => {
+  useLayoutEffect(() => {
     localStorage.setItem("chats", JSON.stringify(chats));
   }, [chats]);
 
@@ -63,10 +49,9 @@ export default function History() {
     <Stack
       sx={{
         height: "100vh",
-        background:
-          screenSize && themeContext.mode === "light"
-            ? "linear-gradient(180deg, #F9FAFA 59%, #EDE4FF 100%)"
-            : "",
+        background: screenSize && themeContext.mode === "light"
+          ? "linear-gradient(180deg, #F9FAFA 59%, #EDE4FF 100%)"
+          : "",
       }}
       direction="column"
       justifyContent="space-between"
@@ -80,8 +65,6 @@ export default function History() {
           overflow: "auto",
           px: 2,
           scrollbarWidth: "none",
-          /* For WebKit browsers */
-          "&::-webkit-scrollbar": { display: "none" },
         }}
       >
         <Typography component="h1" variant="h4" textAlign="center" gutterBottom>
@@ -119,24 +102,11 @@ export default function History() {
                   width: "100%",
                 }}
               >
-                {getDatedetails(ele?.human?.time) || "Previous Chat"}
+                {getDatedetails(ele?.human?.time)}
               </Typography>
 
-              {/* Human message */}
-              <ChatCard key={`human-${ele?.human?.id ?? idx}`} details={ele?.human} isReadOnly />
-              <Box data-cy="human-message" sx={{ pl: 2 }}>
-                <Typography>
-                  {ele?.human?.chat ?? "No human message"}
-                </Typography>
-              </Box>
-
-              {/* AI message */}
-              <ChatCard key={`ai-${ele?.AI?.id ?? idx}`} details={ele?.AI} isReadOnly />
-              <Box data-cy="ai-message" sx={{ pl: 2 }}>
-                <Typography>
-                  {ele?.AI?.chat ?? "No AI message"}
-                </Typography>
-              </Box>
+              <ChatCard key={`human-${idx}`} details={ele?.human} isReadOnly />
+              <ChatCard key={`ai-${idx}`} details={ele?.AI} isReadOnly />
             </Stack>
           ))
         ) : (
