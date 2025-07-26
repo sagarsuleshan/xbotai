@@ -14,7 +14,6 @@ export default function History() {
   const [chats, setChats] = useState([]);
   const [option, setOption] = useState(0);
   const [filteredChats, setFilteredChats] = useState([]);
-  // const navigate = useNavigate();
 
   function getMonthFromNo(no) {
     switch (no) {
@@ -51,21 +50,11 @@ export default function History() {
     date = new Date(date);
     let current = new Date();
     // Remove time part for pure day comparison
-    let dateDay = new Date(
-      date.getFullYear(),
-      date.getMonth(),
-      date.getDate()
-    ).getTime();
-    let currDay = new Date(
-      current.getFullYear(),
-      current.getMonth(),
-      current.getDate()
-    ).getTime();
+    let dateDay = new Date(date.getFullYear(), date.getMonth(), date.getDate()).getTime();
+    let currDay = new Date(current.getFullYear(), current.getMonth(), current.getDate()).getTime();
     const MS_PER_DAY = 86400000;
-    if (
-      date.getFullYear() === current.getFullYear() &&
-      date.getMonth() === current.getMonth()
-    ) {
+
+    if (date.getFullYear() === current.getFullYear() && date.getMonth() === current.getMonth()) {
       if (dateDay === currDay) {
         return "Today's Chat";
       }
@@ -73,27 +62,21 @@ export default function History() {
         return "Yesterday's Chat";
       }
     }
-    return `${date.getDate()} ${getMonthFromNo(
-      date.getMonth()
-    )} ${date.getFullYear()}`;
+    return `${date.getDate()} ${getMonthFromNo(date.getMonth())} ${date.getFullYear()}`;
   }
 
+  // Sync chats to localStorage when chats change
   useEffect(() => {
     localStorage.setItem("chats", JSON.stringify(chats));
   }, [chats]);
 
-  // Load chats on mount
-  // useEffect(() => {
-  //   const savedChats = JSON.parse(localStorage.getItem("chats")) || [];
-  //   if (savedChats.length > 0) {
-  //     setChats(savedChats);
-  //     setFilteredChats(savedChats);
-  //   }
-  // }, []);
-
+  // Load chats from localStorage once on mount, update filteredChats
   useEffect(() => {
     const savedChats = JSON.parse(localStorage.getItem("chats")) || [];
-    setChats(savedChats);
+    if (savedChats.length > 0) {
+      setChats(savedChats);
+      setFilteredChats(savedChats);
+    }
   }, []);
 
   return (
@@ -111,36 +94,17 @@ export default function History() {
       <Navbar handleSidebar={context.handleSidebar} />
 
       <Box
-        sx={{ mb: 1, height: "100%", scrollbarWidth: "none" }}
-        gap={10}
-        overflow="scroll"
-        justifyContent="end"
+        sx={{
+          mb: 1,
+          height: "100%",
+          scrollbarWidth: "none",
+          overflow: "auto",
+          px: 2,
+        }}
       >
-        {/* <Typography
-          component="h1"
-          sx={{ textAlign: "center", mt: chats.length ? "auto" : "10%" }}
-        >
+        <Typography component="h1" variant="h4" textAlign="center" gutterBottom>
           Past Conversations
-        </Typography> */}
-
-        <div>
-          <Typography
-            component="h1"
-            variant="h4"
-            textAlign="center"
-            gutterBottom
-          >
-            Past Conversations
-          </Typography>
-          {chats.map(
-            (msg) =>
-              msg.chat && (
-                <Typography key={msg.id} variant="body1">
-                  {msg.chat}
-                </Typography>
-              )
-          )}
-        </div>
+        </Typography>
 
         {chats.length > 0 && (
           <FilterByRating
@@ -167,7 +131,6 @@ export default function History() {
                 component="h3"
                 sx={{
                   textAlign: "center",
-                  mt: chats.length ? "auto" : "10%",
                   position: "absolute",
                   top: -44,
                   width: "100%",
@@ -175,23 +138,12 @@ export default function History() {
               >
                 {getDatedetails(ele?.human?.time) || "Previous Chat"}
               </Typography>
-              <ChatCard
-                key={`human-${ele?.human?.id ?? idx}`}
-                details={ele?.human}
-                isReadOnly
-              />
-              <ChatCard
-                key={`ai-${ele?.AI?.id ?? idx}`}
-                details={ele?.AI}
-                isReadOnly
-              />
+              <ChatCard key={`human-${ele?.human?.id ?? idx}`} details={ele?.human} isReadOnly />
+              <ChatCard key={`ai-${ele?.AI?.id ?? idx}`} details={ele?.AI} isReadOnly />
             </Stack>
           ))
         ) : (
-          <Box
-            component="div"
-            sx={{ textAlign: "center", mt: chats.length ? "auto" : "10%" }}
-          >
+          <Box sx={{ textAlign: "center", mt: chats.length ? "auto" : "10%" }}>
             No History
           </Box>
         )}
@@ -199,13 +151,7 @@ export default function History() {
 
       <Input
         handleSave={() => {
-          localStorage.setItem(
-            "chats",
-            JSON.stringify([
-              ...(JSON.parse(localStorage.getItem("chats")) || []),
-              ...chats,
-            ])
-          );
+          localStorage.setItem("chats", JSON.stringify(chats));
           setChats([]);
         }}
         page="history"
