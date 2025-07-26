@@ -93,9 +93,7 @@ export default function History() {
 
   useEffect(() => {
     const savedChats = JSON.parse(localStorage.getItem("chats")) || [];
-    if (savedChats.length > 0) {
-      setChats(savedChats);
-    }
+    setChats(savedChats);
   }, []);
 
   return (
@@ -118,12 +116,31 @@ export default function History() {
         overflow="scroll"
         justifyContent="end"
       >
-        <Typography
+        {/* <Typography
           component="h1"
           sx={{ textAlign: "center", mt: chats.length ? "auto" : "10%" }}
         >
           Past Conversations
-        </Typography>
+        </Typography> */}
+
+        <div>
+          <Typography
+            component="h1"
+            variant="h4"
+            textAlign="center"
+            gutterBottom
+          >
+            Past Conversations
+          </Typography>
+          {chats.map(
+            (msg) =>
+              msg.chat && (
+                <Typography key={msg.id} variant="body1">
+                  {msg.chat}
+                </Typography>
+              )
+          )}
+        </div>
 
         {chats.length > 0 && (
           <FilterByRating
