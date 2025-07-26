@@ -73,7 +73,16 @@ export default function ChatCard({ details, isReadOnly = false, setChats }) {
           <Typography variant="heading">
             {details?.type === "AI" ? "Soul AI" : "You"}
           </Typography>
-          <Typography variant="body1">{details?.chat || "chat"}</Typography>
+          
+          {/* <Typography variant="body1">{details?.chat || "chat"}</Typography> */}
+          
+          <Typography
+            variant="body1"
+            className="MuiInputBase-root MuiOutlinedInput-root MuiInputBase-colorPrimary MuiInputBase-formControl css-7yp3ni"
+          >
+            {details?.chat || "chat"}
+          </Typography>
+          
           <Stack direction="row" spacing={3} mt={1} alignItems="center">
             <Typography
               variant="subheading"
